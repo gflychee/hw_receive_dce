@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <cfloat>
+#include <map>
 #pragma pack(push)
 #pragma pack(1)
 
@@ -124,17 +125,18 @@ void UDPPush(uint8_t *pkt, int pkt_len)
     long rece_time = currtime();
     // 解析第一个uint16_t字段判断数据类型
     uint16_t type = *(uint16_t*)pkt;
+    long exchtime = 0;
     switch(type) {
         case 1792:
         {
             new_fld_snap_best_quot_t *best = (new_fld_snap_best_quot_t *)pkt;
             DepthMarketDataField *mds;
-            int insidx = ins2idx(pclient->instab, (const char*)quote->contract_id);
+            int insidx = ins2idx(pclient->instab, (const char*)best->contract_id);
             if (strlen((const char*)best->contract_id) > 8 || insidx == -1) { //过滤期权，组合合约, 过滤wf没订阅的合约
                 break;
             } else {
                 mds = &mdmap[(const char*)best->contract_id];
-                strncpy(mds->InstrumentID, best->contract_id, sizeof(mds->InstrumentID));
+                strncpy(mds->InstrumentID, (const char*)best->contract_id, sizeof(mds->InstrumentID));
                 exchtime = get_exchtime((const char*)best->gen_time, strtol((char*)best->gen_time + 9, NULL, 10));
                 mds->ExchTime = exchtime * 1000000l;
                 mds->LastPrice = best->last_price != DBL_MAX ? best->last_price : 0.0;
@@ -185,7 +187,7 @@ void UDPPush(uint8_t *pkt, int pkt_len)
         {
             new_fld_snap_mbl_t *deep = (new_fld_snap_mbl_t *)pkt;
             DepthMarketDataField *mds;
-            int insidx = ins2idx(pclient->instab, (const char*)quote->contract_id);
+            int insidx = ins2idx(pclient->instab, (const char*)deep->contract_id);
             if (strlen((const char*)deep->contract_id) > 8 || insidx == -1) { //过滤期权，组合合约, 过滤wf没订阅的合约
                 break;
             } else {
@@ -282,10 +284,6 @@ void parse_ether(struct timespec *ts, void *packet, int len) {
 static void run(struct mdclient *client) {
     struct efvi_hw_czce_dce_mc_client *efvi_mc = (struct efvi_hw_czce_dce_mc_client *)client->container;
     pclient = client;
-    memset(ins_inited, 0, sizeof(ins_inited));
-    memset(subscribed, 0, sizeof(subscribed));
-    memset(allmd, 0, sizeof(allmd));
-    memset(prev_exchtime, 0, sizeof(prev_exchtime));
     struct efd *efd = efd_alloc(efvi_mc->ifname, EF_VI_FLAGS_DEFAULT);
     efd_set_callback(efd, parse_ether, NULL);
     efd_add_udp_filter(efd, efvi_mc->udp_srvip, efvi_mc->udp_port);
