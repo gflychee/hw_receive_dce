@@ -280,6 +280,16 @@ void parse_ether(struct timespec *ts, void *packet, int len) {
         UDPPush((uint8_t*)((uint8_t*)packet + poff), ntohs(udp_hdr->len) - sizeof(struct udphdr));
 }
 
+static void mcast_add_group(int sock, const char *mcast_ip, const char *local_ip) {
+    struct ip_mreq group;
+    group.imr_multiaddr.s_addr = inet_addr(mcast_ip);
+
+    if (!strcmp(local_ip, "any"))
+        group.imr_interface.s_addr = INADDR_ANY;
+    else
+        group.imr_interface.s_addr = inet_addr(local_ip);
+    setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&group, sizeof(group));
+}
 
 static void run(struct mdclient *client) {
     struct efvi_hw_czce_dce_mc_client *efvi_mc = (struct efvi_hw_czce_dce_mc_client *)client->container;
@@ -287,6 +297,9 @@ static void run(struct mdclient *client) {
     struct efd *efd = efd_alloc(efvi_mc->ifname, EF_VI_FLAGS_DEFAULT);
     efd_set_callback(efd, parse_ether, NULL);
     efd_add_udp_filter(efd, efvi_mc->udp_srvip, efvi_mc->udp_port);
+    int sock = onload_socket_nonaccel(AF_INET, SOCK_DGRAM, 0);
+    mcast_add_group(sock, efvi_mc->udp_srvip, "any");
+
     efd_poll(&efd, 1);
 }
 

@@ -8,7 +8,7 @@ module_list := wfmd-efvi-hw-czce-receive-dce-mc.so
 efvi-udp.o : efvi-udp.c
 	$(CC) -c -o $@ $^ -fPIC
 wfmd-efvi-hw-czce-receive-dce-mc.so: wfmd-efvi-hw-czce-receive-dce-mc.o efvi-udp.o
-	$(CXX) -shared -o $@ $^ -lciul1
+	$(CXX) -shared -o $@ $^ -lonload -lciul1
 
 CFLAGS := -Wall -I $(DEST)/include -fPIC -O2 -g -pthread -lonload -lciul1
 CXXFLAGS := $(CFLAGS) --std=c++11
