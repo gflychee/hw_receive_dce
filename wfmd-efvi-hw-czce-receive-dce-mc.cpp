@@ -23,6 +23,7 @@
 #include <vector>
 #include <cfloat>
 #include <map>
+#include <onload/extensions.h>
 #pragma pack(push)
 #pragma pack(1)
 
