@@ -92,6 +92,7 @@ struct efvi_hw_czce_dce_mc_client {
     struct mdclient mdclient;
     char   ifname[64];
     char   udp_srvip[32];
+    char   local_ip[32];
     int    udp_port;
     int    debug;
 };
@@ -299,7 +300,7 @@ static void run(struct mdclient *client) {
     efd_set_callback(efd, parse_ether, NULL);
     efd_add_udp_filter(efd, efvi_mc->udp_srvip, efvi_mc->udp_port);
     int sock = onload_socket_nonaccel(AF_INET, SOCK_DGRAM, 0);
-    mcast_add_group(sock, efvi_mc->udp_srvip, "any");
+    mcast_add_group(sock, efvi_mc->udp_srvip, efvi_mc->local_ip);
 
     efd_poll(&efd, 1);
 }
@@ -319,12 +320,17 @@ static struct mdclient *efvi_hw_czce_dce_mc_create(cfg_t *cfg, struct memdb *mem
     cfg_get_string(cfg, "udp_srvip", &udp_srvip);
     snprintf(efvi_mc->udp_srvip, sizeof(efvi_mc->udp_srvip), "%s", udp_srvip);
 
+    const char *local_ip;
+    cfg_get_string(cfg, "local_ip", &local_ip);
+    snprintf(efvi_mc->local_ip, sizeof(efvi_mc->local_ip), "%s", local_ip);
+
     cfg_get_int(cfg, "udp_port", &efvi_mc->udp_port);
     cfg_get_int(cfg, "debug", &efvi_mc->debug);
 
     printf("label efvi_mc->ifname: %s\n", efvi_mc->ifname);
     printf("label efvi_mc->udp_srvip: %s\n", efvi_mc->udp_srvip);
     printf("label efvi_mc->udp_port: %d\n", efvi_mc->udp_port);
+    printf("label efvi_mc->local_ip: %s\n", efvi_mc->local_ip);
     printf("label efvi_mc->debug: %d\n", efvi_mc->debug);
     fflush(stdout);
     client->run = run;
