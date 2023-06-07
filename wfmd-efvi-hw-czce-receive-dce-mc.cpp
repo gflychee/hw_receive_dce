@@ -175,9 +175,9 @@ void UDPPush(uint8_t *pkt, int pkt_len)
                 pclient->output(pclient, mdst, mdslot);
                 struct efvi_hw_czce_dce_mc_client *efvi_mc = (struct efvi_hw_czce_dce_mc_client *)pclient->container;
                 if (efvi_mc->debug) {
-                    printf("label md_tick:%s,%d,%d,%ld,%ld,%ld,%f,%ld,%f,%f,%d,%f,%d,%f,%f\n", \
-                    best->contract_id, mdsn->type, mdsn->open_interest, mdsn->recv_time, mdsn->decode_time, mdsn->exchange_time, mdsn->last_price, mdsn->volume, mdsn->turnover,\ 
-                    mdsn->bid_price[0],mdsn->bid_size[0],mdsn->ask_price[0],mdsn->ask_size[0],mdst->upper_limit, mdst->lower_limit);
+                    printf("label md_tick:%s,%d,%d,%ld,%ld,%ld,%f,%ld,%f,%f,%d,%f,%d,%f,%f\n",\
+                    best->contract_id, mdsn->type, mdsn->open_interest, mdsn->recv_time, mdsn->decode_time, mdsn->exchange_time, mdsn->last_price,\
+                    mdsn->volume, mdsn->turnover,mdsn->bid_price[0],mdsn->bid_size[0],mdsn->ask_price[0],mdsn->ask_size[0],mdst->upper_limit, mdst->lower_limit);
                     fflush(stdout);
                 }
             }
@@ -236,8 +236,8 @@ void UDPPush(uint8_t *pkt, int pkt_len)
 
                 struct efvi_hw_czce_dce_mc_client *efvi_mc = (struct efvi_hw_czce_dce_mc_client *)pclient->container;
                 if (efvi_mc->debug) {
-                    printf("label md_tick:%s,%d,%d,%ld,%ld,%ld,%f,%ld,%f,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%f\n", \
-                    deep->contract_id, mdsn->type, mdsn->open_interest, mdsn->recv_time, mdsn->decode_time, mdsn->exchange_time, mdsn->last_price, mdsn->volume, mdsn->turnover, \
+                    printf("label md_tick:%s,%d,%d,%ld,%ld,%ld,%f,%ld,%f,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%d,%f,%f\n",\
+                    deep->contract_id, mdsn->type, mdsn->open_interest, mdsn->recv_time, mdsn->decode_time, mdsn->exchange_time, mdsn->last_price, mdsn->volume, mdsn->turnover,\
                     mdsn->bid_price[0],mdsn->bid_size[0],mdsn->ask_price[0],mdsn->ask_size[0],mdsn->bid_price[1],mdsn->bid_size[1],mdsn->ask_price[1],mdsn->ask_size[1],\
                     mdsn->bid_price[2],mdsn->bid_size[2],mdsn->ask_price[2],mdsn->ask_size[2],mdsn->bid_price[3],mdsn->bid_size[3],mdsn->ask_price[3],mdsn->ask_size[3],\
                     mdsn->bid_price[4],mdsn->bid_size[4],mdsn->ask_price[4],mdsn->ask_size[4],mdst->upper_limit, mdst->lower_limit);
